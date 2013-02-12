@@ -1,0 +1,9 @@
+#mt_content_set_filename:
+#  url: /:sf_culture/mtContent/setFilename/:mt_content_module/:mt_content_action
+#  param: { module: mtContent, action: setFilename }
+#
+#mt_content_set_filename_fn:
+#  url: /:sf_culture/mtContent/setFilename/:mt_content_module/:mt_content_action/:mt_content_filename
+#  param: { module: mtContent, action: setFilename }
+#  options:
+#    segment_separators: [/]
