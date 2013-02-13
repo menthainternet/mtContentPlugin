@@ -18,12 +18,13 @@ class mtContent
   *
   * @static
   *
-  * @param  string $filename Filename
+  * @param string $filename    Filename
+  * @param array  $routeParams Custom routing parameters
   *
   * @throws InvalidArgumentException If filename is empty
   * @throws sfStopException          On redirect
   */
-  static public function setFilename($filename)
+  static public function setFilename($filename, $routeParams = array())
   {
     $context = sfContext::getInstance();
     $userAttributes = $context->getUser()->getAttributeHolder();
@@ -58,10 +59,15 @@ class mtContent
       'request_params' => $request->getParameterHolder()->getAll()
     ), self::NS_SET_FILENAME);
 
-    $context->getController()->redirect(url_for('mt_content_set_filename', array(
-      'mt_content_module' => $request->getParameter('module'),
-      'mt_content_action' => $request->getParameter('action')
-    )) . "/" . rawurlencode($filename));
+    if (!sfConfig::get('app_mt_content_plugin_set_filename_route_pattern'))
+    {
+      $routeParams = array(
+        'mt_content_module' => $request->getParameter('module'),
+        'mt_content_action' => $request->getParameter('action')
+      );
+    }
+
+    $context->getController()->redirect(url_for('mt_content_set_filename', $routeParams) . "/" . rawurlencode($filename));
 
     throw new sfStopException();
   }
@@ -107,7 +113,7 @@ class mtContent
     }
 
     // add charset on text content and json
-    if ($options['charset'] and (((false === stripos($options['type'], 'charset')) and ((0 === stripos($options['type'], 'text/')) or (strlen($options['type']) - 3 === strripos($options['type'], 'xml')))) or ('application/json' == $options['type'])))
+    if ($options['charset'] && ((false === stripos($options['type'], 'charset') && (0 === stripos($options['type'], 'text/') || strlen($options['type']) - 3 === strripos($options['type'], 'xml'))) || 'application/json' == $options['type']))
     {
       $options['type'] .= '; charset=' . $options['charset'];
     }
@@ -115,7 +121,7 @@ class mtContent
     $response->setContentType($options['type']);
 
     // set force download except for json
-    if ((null === $options['force_download']) and !preg_match('/application\\/json(;|$)/', $options['type']))
+    if (null === $options['force_download'] && !preg_match('/application\\/json(;|$)/', $options['type']))
     {
       $options['force_download'] = true;
     }
@@ -156,7 +162,7 @@ class mtContent
   */
   static public function moveUploadedFile($file, $destination, $overwrite = false)
   {
-    if (!is_array($file) or !isset($file['tmp_name']) or !is_uploaded_file($file['tmp_name']))
+    if (!is_array($file) || !isset($file['tmp_name']) || !is_uploaded_file($file['tmp_name']))
     {
       throw new InvalidArgumentException('File must be a valid uploaded file.');
     }
