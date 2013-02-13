@@ -33,6 +33,8 @@ json_service:
   ...
 ```
 
+actions.class.php:
+
 ```php
 public function executeMyService(sfWebRequest $request)
 {
@@ -54,6 +56,8 @@ json_service:
   param: { module: services, action: myService }
   ...
 ```
+
+actions.class.php:
 
 ```php
 public function executeMyService(sfWebRequest $request)
