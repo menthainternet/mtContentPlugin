@@ -112,19 +112,20 @@ class mtContent
       $options['type'] = self::getTypeFromExtension($options['extension']);
     }
 
-    // add charset on text content and json
-    if ($options['charset'] && ((false === stripos($options['type'], 'charset') && (0 === stripos($options['type'], 'text/') || strlen($options['type']) - 3 === strripos($options['type'], 'xml'))) || 'application/json' == $options['type']))
+    // set charset for text content and json, force download for others
+    if ((false === stripos($options['type'], 'charset') && (0 === stripos($options['type'], 'text/') || strlen($options['type']) - 3 === strripos($options['type'], 'xml'))) || 'application/json' == $options['type'])
     {
-      $options['type'] .= '; charset=' . $options['charset'];
+      if ($options['charset'])
+      {
+        $options['type'] .= '; charset=' . $options['charset'];
+      }
     }
-
-    $response->setContentType($options['type']);
-
-    // set force download except for json
-    if (null === $options['force_download'] && !preg_match('/application\\/json(;|$)/', $options['type']))
+    elseif (null === $options['force_download'])
     {
       $options['force_download'] = true;
     }
+
+    $response->setContentType($options['type']);
 
     if ($options['force_download'])
     {
